@@ -1,0 +1,8 @@
+venv
+.env
+
+db.sqlite3
+profile_image
+
+media
+.idea
