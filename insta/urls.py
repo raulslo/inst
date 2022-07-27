@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from drf_yasg.views import get_schema_view
 from django.urls import path, include
-from accounts.views import LoginView, RegisterView
+from accounts.views import LoginAPIView, RegisterView
 from drf_yasg import openapi
 from rest_framework import permissions
 
@@ -36,10 +36,11 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
     path("api/", include("posts.urls")),
     path('api/account/', include('accounts.urls')),
-    path("login/", LoginView.as_view()),
+    path("login/", LoginAPIView.as_view()),
     path('register/', RegisterView.as_view(), name='register'),
 
     path('swagger/', schema_view.with_ui('swagger',

@@ -3,12 +3,6 @@ from rest_framework import serializers
 from .models import User, UserProfile
 
 
-class AppUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = "id username password".split()
-
-
 class RegistrationSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=255)
     last_name = serializers.CharField(max_length=255)
@@ -74,7 +68,37 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
 
         extra_kwargs = {
             "followed_by": {
-                "read_only": True,}
+                "read_only": True, },
+            "followed": {
+                "read_only": True, }
         }
 
 
+class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'profile']
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
+
+        password = validated_data.pop('password')
+
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+
+        UserProfile.objects.create(user=user, **profile_data)
+
+        return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', None)
+
+        if profile_data is not None:
+            instance.profile.user = profile_data['user']
+            instance.profile.save()
+
+        return super().update(instance, validated_data)

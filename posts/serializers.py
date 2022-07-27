@@ -1,15 +1,15 @@
 from rest_framework import serializers
 from .models import Post, Comment, Like
-from django.contrib.auth.models import User
-from accounts.serializers import AppUserSerializer
+from accounts.models import User
+from accounts.serializers import UserSerializer
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    profile = AppUserSerializer(read_only=True)
+    profile = UserSerializer(read_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "username", "email"]
+        fields = ["id", "username", "email", 'profile']
         depth = 1
 
         extra_kwargs = {"profile": {"read_only": True}}
@@ -63,6 +63,7 @@ class PostSerializer(serializers.ModelSerializer):
             "author": {"read_only": True},
             "is_liked": {"read_only": True},
         }
+
 
     @staticmethod
     def get_likes_amount(obj):

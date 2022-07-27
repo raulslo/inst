@@ -20,6 +20,8 @@ class Post(models.Model):
         ordering = ["-created_date"]
 
 
+
+
 class Like(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(

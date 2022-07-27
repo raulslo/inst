@@ -1,12 +1,12 @@
-from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework import status, generics
+
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.db import IntegrityError
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from accounts.models import User, UserProfile
-from accounts.serializers import LoginSerializer, RegistrationSerializer, AppUserSerializer, ProfileSerializer
+from accounts.serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ProfileSerializer
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
@@ -22,7 +22,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [UpdateOwnUser]
-    serializer_class = AppUserSerializer
+    serializer_class = UserSerializer
     filter_backends = [OrderingFilter, DjangoFilterBackend]
     filterset_fields = ["username"]
     search_fields = ["username"]
@@ -40,18 +40,13 @@ class RegisterView(APIView):
         return Response(serializer.errors)
 
 
-class LoginView(GenericAPIView):
-    permission_classes = (AllowAny,)
+class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
-    def get_token(self, obj):
-        user = User.objects.filter(email=obj.get("email")).first()
-        return user.token()
-
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(self.get_token(serializer.data), status=status.HTTP_200_OK)
+        serializers = self.serializer_class(data=request.data)
+        serializers.is_valid(raise_exception=True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
@@ -67,6 +62,7 @@ class ProfileViewSet(ModelViewSet):
     serializer_class = ProfileSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,
                           UpdateOwnProfile,)
+
 
     def perform_create(self, serializer):
         user = self.request.user

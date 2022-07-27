@@ -53,6 +53,7 @@ class UserProfile(models.Model):
         return f'{self.user} Profile'
 
 
+
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         try:
