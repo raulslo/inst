@@ -72,7 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = 'username password email'.split()
+        fields = 'username password email profile'.split()
 
 
 

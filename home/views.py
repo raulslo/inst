@@ -11,50 +11,25 @@ from .models import *
 from .permissions import UpdateOwn
 
 from rest_framework import permissions, generics
-from .base import CreateUpdateDestroy, CreateRetrieveUpdateDestroy
 
 from .base import IsAuthor
 from .models import Post, Comment
-from .serializers import PostSerializer, ListPostSerializer, CreateCommentSerializer
-
-
-
-class FeedApiView(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
-    serializer_class = PostSerializer
-
-    def get(self, request, pk=None):
-        follows = User.objects.get(user=request.user).follows.all()
-        feed_queryset = Post.objects.filter(author__id__in=follows)
-        data = self.serializer_class(
-            feed_queryset, many=True, context={"request": request}
-        ).data
-
-        return Response(data=data)
+from .serializers import PostSerializer, ListCommentSerializer
 
 
 
 
 class PostView(viewsets.ModelViewSet):
-
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Post.objects.all().select_related('author').prefetch_related('comments')
     serializer_class = PostSerializer
 
 
-
-
-
-
-
-
 class CommentsView(viewsets.ModelViewSet):
-
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
     queryset = Comment.objects.all()
-    serializer_class = CreateCommentSerializer
-
+    permission_classes = [IsAuthenticatedOrReadOnly, UpdateOwn]
+    serializer_class = ListCommentSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -80,20 +55,6 @@ class LikeViewSet(ModelViewSet):
         return Response(data=serializer, status=status.HTTP_201_CREATED)
 
 
-class LikedApiView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = PostSerializer
-
-    def get(self, request):
-        liked_posts = Post.objects.filter(likes__author__id=request.user.id)
-        serializer_data = self.serializer_class(
-            liked_posts, many=True, context={"request": request}
-        ).data
-
-        return Response(data=serializer_data)
-
-
 class PostLikes(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = LikesSerializer
@@ -107,15 +68,3 @@ class PostLikes(APIView):
 
         return Response(data={"likes": likes_data, "is_liked": post_data["is_liked"]})
 
-
-# class PostComments(APIView):
-#     authentication_classes = [TokenAuthentication]
-#     serializer_class = CommentSerializer
-#
-#     def get(self, request, post_id):
-#         post = get_object_or_404(Post, pk=post_id)
-#         comments_data = self.serializer_class(
-#             post.comments, many=True, context={"request": request}
-#         ).data
-#
-#         return Response(data=comments_data)

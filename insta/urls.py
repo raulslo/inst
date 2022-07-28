@@ -40,8 +40,8 @@ schema_view = get_schema_view(
 urlpatterns = [
 
     path('admin/', admin.site.urls),
-    path("api/v1/", include("posts.urls")),
-    path('api/account/', include('user.urls')),
+    path("api/main/", include("home.urls")),
+    path('api/user/', include('user.urls')),
     path("login/", LoginAPIView.as_view()),
     path('register/', RegisterView.as_view(), name='register'),
 

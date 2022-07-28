@@ -6,7 +6,6 @@ from user.serializers import UserSerializer
 
 class FilterCommentListSerializer(serializers.ListSerializer):
 
-
     def to_representation(self, data):
         data = data.filter(parent=None)
         return super().to_representation(data)
@@ -30,25 +29,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         extra_kwargs = {"profile": {"read_only": True}}
 
 
-class LikesSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
-
-    class Meta:
-        model = Like
-        fields = "__all__"
-
-        extra_kwargs = {"author": {"read_only": True}}
-
-
-class CreateCommentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Comment
-        fields = ("post", "text", "parent")
-
-
 class ListCommentSerializer(serializers.ModelSerializer):
-
     text = serializers.SerializerMethodField()
     children = RecursiveSerializer(many=True)
     user = AuthorSerializer(read_only=True)
@@ -82,7 +63,7 @@ class ListPostSerializer(serializers.ModelSerializer):
         fields = "author_id create_date author text  comments_count".split()
 
 
-class LikesDetailedSerializer(serializers.ModelSerializer):
+class LikesSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     post = PostSerializer(read_only=True)
 

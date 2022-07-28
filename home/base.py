@@ -3,10 +3,8 @@ from rest_framework.permissions import BasePermission
 from rest_framework import generics, permissions, mixins, decorators, viewsets
 
 
-
 class IsMemberGroup(BasePermission):
-    """ Участик группы или админимтратор
-    """
+
     def has_object_permission(self, request, view, obj):
         return request.user in obj.group.members.all() or obj.group.founder == request.user
 
@@ -31,7 +29,6 @@ class IsAuthor(BasePermission):
         return obj.user == request.user
 
 
-
 class MixedPermission:
     def get_permissions(self):
         try:
@@ -49,19 +46,8 @@ class MixedPermissionGenericViewSet(MixedPermission, viewsets.GenericViewSet):
 
 
 class CreateUpdateDestroy(mixins.CreateModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.DestroyModelMixin,
-                            MixedPermission,
-                            viewsets.GenericViewSet):
-
-    pass
-
-
-class CreateRetrieveUpdateDestroy(mixins.CreateModelMixin,
-                                    mixins.RetrieveModelMixin,
-                                    mixins.UpdateModelMixin,
-                                    mixins.DestroyModelMixin,
-                                    MixedPermission,
-                                    viewsets.GenericViewSet):
-
+                          mixins.UpdateModelMixin,
+                          mixins.DestroyModelMixin,
+                          MixedPermission,
+                          viewsets.GenericViewSet):
     pass

@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class PostsApiConfig(AppConfig):
-    name = 'posts'
+    name = 'home'

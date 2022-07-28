@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import *
 
 router = DefaultRouter()
-router.register("posts", PostView, basename='post')
+router.register("home", PostView, basename='post')
 router.register("comments", CommentsView, basename='commet')
 router.register("likes", LikeViewSet,  basename='like')
 
