@@ -13,13 +13,11 @@ import os
 from pathlib import Path
 from environs import Env
 
-
 env = Env()
 env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -33,7 +31,6 @@ DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition/static/
 
 INSTALLED_APPS = [
@@ -44,17 +41,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'mptt',
     'rest_framework',
     'drf_yasg',
     'django_filters',
+
     "rest_framework.authtoken",
     'rest_auth',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    
-    'accounts',
+    'comments',
+
+    'user',
     'posts',
 ]
 
@@ -69,9 +70,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-
-
 
 ROOT_URLCONF = 'insta.urls'
 
@@ -94,17 +92,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'insta.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3'
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3'
     }
-
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -124,7 +120,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -142,8 +137,8 @@ DEFAULT_CHARSET = 'utf-8'
 
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "/media/")
-STATIC_ROOT = os.path.join(BASE_DIR , "staticfiles")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -154,7 +149,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    ),}
+    ),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',)
+
+}
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',

@@ -1,7 +1,22 @@
 from rest_framework import serializers
 from .models import Post, Comment, Like
-from accounts.models import User
-from accounts.serializers import UserSerializer
+from user.models import User
+from user.serializers import UserSerializer
+
+
+class FilterCommentListSerializer(serializers.ListSerializer):
+
+
+    def to_representation(self, data):
+        data = data.filter(parent=None)
+        return super().to_representation(data)
+
+
+class RecursiveSerializer(serializers.Serializer):
+
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -25,59 +40,46 @@ class LikesSerializer(serializers.ModelSerializer):
         extra_kwargs = {"author": {"read_only": True}}
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
+class CreateCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = ("post", "text", "parent")
 
-        extra_kwargs = {"author": {"read_only": True}}
+
+class ListCommentSerializer(serializers.ModelSerializer):
+
+    text = serializers.SerializerMethodField()
+    children = RecursiveSerializer(many=True)
+    user = AuthorSerializer(read_only=True)
+
+    def get_text(self, obj):
+        if obj.deleted:
+            return None
+        return obj.text
+
+    class Meta:
+        list_serializer_class = FilterCommentListSerializer
+        model = Comment
+        fields = "id post user  text  created_date update_date deleted children".split()
 
 
 class PostSerializer(serializers.ModelSerializer):
-
-    likes = LikesSerializer(many=True, read_only=True)
-    comments = CommentSerializer(many=True, read_only=True)
-    likes_amount = serializers.SerializerMethodField("get_likes_amount")
-    comments_amount = serializers.SerializerMethodField("get_comments_amount")
-    author = AuthorSerializer(read_only=True)
-    is_liked = serializers.SerializerMethodField("get_is_liked")
+    user = AuthorSerializer(read_only=True)
+    comments = ListCommentSerializer(many=True, read_only=True)
+    view_count = serializers.CharField(read_only=True)
 
     class Meta:
         model = Post
-        fields = [
-            "id",
-            "author",
-            "description",
-            "image",
-            "created_date",
-            "is_liked",
-            "likes",
-            "likes_amount",
-            "comments",
-            "comments_amount",
-        ]
-        depth = 1
-        extra_kwargs = {
-            "author": {"read_only": True},
-            "is_liked": {"read_only": True},
-        }
+        fields = "id user image  author text comments view_count".split()
 
 
-    @staticmethod
-    def get_likes_amount(obj):
-        return obj.likes.count()
+class ListPostSerializer(serializers.ModelSerializer):
+    user = AuthorSerializer
 
-    @staticmethod
-    def get_comments_amount(obj):
-        return obj.comments.count()
-
-    def get_is_liked(self, obj):
-        user = self.context["request"].user
-        if user and not user.is_anonymous:
-            return bool(obj.likes.filter(author=user))
-        return None
+    class Meta:
+        model = Post
+        fields = "author_id create_date author text  comments_count".split()
 
 
 class LikesDetailedSerializer(serializers.ModelSerializer):

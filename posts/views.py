@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
-from rest_framework import status
+from rest_framework import status, viewsets
 
 from rest_framework.views import Response
 from django.shortcuts import get_object_or_404
@@ -10,6 +10,12 @@ from .serializers import *
 from .models import *
 from .permissions import UpdateOwn
 
+from rest_framework import permissions, generics
+from .base import CreateUpdateDestroy, CreateRetrieveUpdateDestroy
+
+from .base import IsAuthor
+from .models import Post, Comment
+from .serializers import PostSerializer, ListPostSerializer, CreateCommentSerializer
 
 
 
@@ -28,26 +34,35 @@ class FeedApiView(APIView):
         return Response(data=data)
 
 
-class PostViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    authentication_classes = [TokenAuthentication]
+
+
+class PostView(viewsets.ModelViewSet):
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Post.objects.all().select_related('author').prefetch_related('comments')
     serializer_class = PostSerializer
-    queryset = Post.objects.all()
-    filterset_fields = ["author__id", "description"]
-    search_fields = ["description"]
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
 
 
-class CommentViewSet(ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly, UpdateOwn]
-    serializer_class = CommentSerializer
+
+
+
+
+
+
+class CommentsView(viewsets.ModelViewSet):
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Comment.objects.all()
+    serializer_class = CreateCommentSerializer
+
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        instance.deleted = True
+        instance.save()
+
 
 
 class LikeViewSet(ModelViewSet):
@@ -93,14 +108,14 @@ class PostLikes(APIView):
         return Response(data={"likes": likes_data, "is_liked": post_data["is_liked"]})
 
 
-class PostComments(APIView):
-    authentication_classes = [TokenAuthentication]
-    serializer_class = CommentSerializer
-
-    def get(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
-        comments_data = self.serializer_class(
-            post.comments, many=True, context={"request": request}
-        ).data
-
-        return Response(data=comments_data)
+# class PostComments(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     serializer_class = CommentSerializer
+#
+#     def get(self, request, post_id):
+#         post = get_object_or_404(Post, pk=post_id)
+#         comments_data = self.serializer_class(
+#             post.comments, many=True, context={"request": request}
+#         ).data
+#
+#         return Response(data=comments_data)
