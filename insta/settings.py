@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mptt',
+
+
     'rest_framework',
     'drf_yasg',
     'django_filters',
@@ -54,7 +55,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-
+    'mptt',
     'user',
     'home',
 ]

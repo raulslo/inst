@@ -20,11 +20,9 @@ class IsAuthor(BasePermission):
         return obj.user == request.user
 
 
-class MixedPermission:
-    def get_permissions(self):
-        try:
-            return [permission() for permission in self.permission_classes_by_action[self.action]]
-        except KeyError:
-            return [permission() for permission in self.permission_classes]
+class UpdateOwn(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return obj.author.id == request.user.id
 
 

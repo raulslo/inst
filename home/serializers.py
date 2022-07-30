@@ -4,7 +4,11 @@ from user.models import User
 from user.serializers import UserSerializer
 
 
+class FilterCommentListSerializer(serializers.ListSerializer):
 
+    def to_representation(self, data):
+        data = data.filter(parent=None)
+        return super().to_representation(data)
 class RecursiveSerializer(serializers.Serializer):
 
     def to_representation(self, value):

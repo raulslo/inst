@@ -7,7 +7,7 @@ router.register("home", PostView, basename='post')
 router.register("comments", CommentsView, basename='commet')
 router.register("likes", LikeViewSet,  basename='like')
 
-app_name = "posts_api"
+app_name = "main_api"
 
 urlpatterns = [
 

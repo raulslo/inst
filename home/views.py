@@ -1,18 +1,19 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.views import APIView
+
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import status, viewsets
 
 from rest_framework.views import Response
 from django.shortcuts import get_object_or_404
-from .serializers import *
-from .models import *
-from .permissions import UpdateOwn
-
-from rest_framework import permissions, generics
 
 from .base import IsAuthor
+from .serializers import *
+from .models import *
+from .base import UpdateOwn
+
+from rest_framework import permissions
+
 from .models import Post, Comment
 from .serializers import PostSerializer, ListCommentSerializer
 
@@ -28,9 +29,9 @@ class PostView(viewsets.ModelViewSet):
 class CommentsView(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     queryset = Comment.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly, UpdateOwn]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ListCommentSerializer
-
+    permission_classes_by_action = [IsAuthor]
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -55,16 +56,16 @@ class LikeViewSet(ModelViewSet):
         return Response(data=serializer, status=status.HTTP_201_CREATED)
 
 
-class PostLikes(APIView):
-    authentication_classes = [TokenAuthentication]
-    serializer_class = LikesSerializer
-
-    def get(self, request, post_id):
-        post = get_object_or_404(Post, pk=post_id)
-        post_data = PostSerializer(post, context={"request": request}).data
-        likes_data = self.serializer_class(
-            post.likes, many=True, context={"request": request}
-        ).data
-
-        return Response(data={"likes": likes_data, "is_liked": post_data["is_liked"]})
-
+# class PostLikes(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     serializer_class = LikesSerializer
+#
+#     def get(self, request, post_id):
+#         post = get_object_or_404(Post, pk=post_id)
+#         post_data = PostSerializer(post, context={"request": request}).data
+#         likes_data = self.serializer_class(
+#             post.likes, many=True, context={"request": request}
+#         ).data
+#
+#         return Response(data={"likes": likes_data, "is_liked": post_data["is_liked"]})
+#

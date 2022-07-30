@@ -26,7 +26,6 @@ class Post(models.Model):
 
 
 class AbstractComment(models.Model):
-    """Абстрактная модель комментариев"""
     text = models.TextField(max_length=512)
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
