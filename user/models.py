@@ -45,7 +45,7 @@ class UserProfile(models.Model):
     bio = models.CharField(max_length=100, null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     photo = models.ImageField(upload_to="", null=True, blank=True)
-    age = models.IntegerField(blank=True, null=True)
+    age = models.PositiveIntegerField(blank=True, null=True)
 
 
 

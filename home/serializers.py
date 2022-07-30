@@ -21,7 +21,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", 'profile']
+        fields = "id username email profile".split()
         depth = 1
 
         extra_kwargs = {"profile": {"read_only": True}}

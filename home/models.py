@@ -43,7 +43,7 @@ class AbstractComment(models.Model):
 class Comment(AbstractComment, MPTTModel):
     text = models.TextField(max_length=250)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,
-                             blank=True, related_name='author' )
+                             blank=True, related_name='author')
     post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE, null=True,
                              blank=True, )
     parent = TreeForeignKey(

@@ -56,16 +56,3 @@ class LikeViewSet(ModelViewSet):
         return Response(data=serializer, status=status.HTTP_201_CREATED)
 
 
-# class PostLikes(APIView):
-#     authentication_classes = [TokenAuthentication]
-#     serializer_class = LikesSerializer
-#
-#     def get(self, request, post_id):
-#         post = get_object_or_404(Post, pk=post_id)
-#         post_data = PostSerializer(post, context={"request": request}).data
-#         likes_data = self.serializer_class(
-#             post.likes, many=True, context={"request": request}
-#         ).data
-#
-#         return Response(data={"likes": likes_data, "is_liked": post_data["is_liked"]})
-#
