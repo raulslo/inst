@@ -1,10 +1,11 @@
+
 from rest_framework import status, generics
 
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from rest_framework.views import APIView
 
-from user.base import UpdateOwnProfile
+from user.base import UpdateOwnProfile, UpdateOwnUser
 from user.models import User, UserProfile, Follower
 from user.serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ProfileSerializer, \
     ListFollowerSerializer
@@ -14,16 +15,18 @@ from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter
+
+from rest_framework import filters
 
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     authentication_classes = [TokenAuthentication]
     serializer_class = UserSerializer
-    filter_backends = [OrderingFilter, DjangoFilterBackend]
-    filterset_username = ["username"]
-    search_username = ["username"]
+    permission_classes = [UpdateOwnUser]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filterset_fields = ["username"]
+    search_fields = ["username"]
 
 
 class RegisterView(APIView):
