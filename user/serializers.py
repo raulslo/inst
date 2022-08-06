@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import User, UserProfile ,Follower
+from .models import User, UserProfile, Follower
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -56,25 +56,21 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = UserProfile
-            fields = '__all__'
-
+    class Meta:
+        model = UserProfile
+        fields = "__all__"
 
 
 class UserFollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileSerializer
-        fields = 'id  username  photo'.split()
+        fields = "id  username  photo".split()
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = 'username password email profile'.split()
-
-
+        fields = "username password email profile".split()
 
 
 class ListFollowerSerializer(serializers.ModelSerializer):
@@ -82,4 +78,4 @@ class ListFollowerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follower
-        fields = '__all__'
+        fields = "__all__"

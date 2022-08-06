@@ -2,15 +2,13 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.db import models
 
 
-
-
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None):
         if not email:
-            raise ValueError('User must have an email address')
+            raise ValueError("User must have an email address")
 
         user = self.model(
-            email = self.normalize_email(email),
+            email=self.normalize_email(email),
         )
         user.set_password(password)
         user.save()
@@ -32,13 +30,14 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
-    created = models.DateTimeField('created', auto_now_add=True)
+    created = models.DateTimeField("created", auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    is_admin = models.BooleanField('admin', default=False)
+    is_admin = models.BooleanField("admin", default=False)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
 
-    ordering = ('created',)
+    ordering = ("created",)
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
@@ -47,17 +46,12 @@ class UserProfile(models.Model):
     photo = models.ImageField(upload_to="", null=True, blank=True)
     age = models.PositiveIntegerField(blank=True, null=True)
 
-
-
     def __str__(self):
         return str(self.user)
 
 
 class Follower(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='owner'
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
     follower = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='follower'
+        User, on_delete=models.CASCADE, related_name="follower"
     )
-

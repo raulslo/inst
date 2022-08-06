@@ -8,12 +8,9 @@ app_name = "user"
 router = DefaultRouter()
 router.register("users", UserViewSet)
 router.register("profiles", ProfileViewSet)
-router.register("follow",FollowerView , basename='follow')
-
-
+router.register("follow", FollowerView, basename="follow")
 
 
 urlpatterns = [
     path("", include(router.urls)),
-
 ]

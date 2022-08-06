@@ -1,8 +1,5 @@
-
 from rest_framework.permissions import BasePermission
 from rest_framework import generics, permissions, mixins, decorators, viewsets
-
-
 
 
 class IsAuthorCommentEntry(BasePermission):
@@ -21,8 +18,5 @@ class IsAuthor(BasePermission):
 
 
 class UpdateOwn(permissions.BasePermission):
-
     def has_object_permission(self, request, view, obj):
         return obj.author.id == request.user.id
-
-

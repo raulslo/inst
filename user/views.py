@@ -1,14 +1,22 @@
-
 from rest_framework import status, generics
 
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 
 from rest_framework.views import APIView
 
-from user.base import UpdateOwnProfile, UpdateOwnUser
+from user.permission import UpdateOwnProfile, UpdateOwnUser
 from user.models import User, UserProfile, Follower
-from user.serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ProfileSerializer, \
-    ListFollowerSerializer
+from user.serializers import (
+    LoginSerializer,
+    RegistrationSerializer,
+    UserSerializer,
+    ProfileSerializer,
+    ListFollowerSerializer,
+)
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
@@ -61,8 +69,10 @@ class LogoutView(APIView):
 class ProfileViewSet(ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,
-                          UpdateOwnProfile,)
+    permission_classes = (
+        IsAuthenticatedOrReadOnly,
+        UpdateOwnProfile,
+    )
 
 
 class FollowerView(ModelViewSet):
